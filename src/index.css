@@ -1,0 +1,404 @@
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&family=Chakra+Petch:wght@400;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* DEFENSE TACTICAL COMMAND SYSTEM - All colors MUST be HSL */
+
+@layer base {
+  :root {
+    /* Military Defense Color Palette */
+    --tactical-black: 0 0% 6%;           /* Deep command black */
+    --tactical-dark: 120 5% 10%;         /* Dark military gray */
+    --tactical-surface: 120 8% 14%;      /* Command surface */
+    --tactical-elevated: 120 8% 18%;     /* Elevated panels */
+    
+    --mil-green: 140 95% 35%;            /* Military green primary */
+    --mil-green-bright: 140 95% 45%;     /* Bright tactical green */
+    --mil-green-glow: 140 100% 50%;      /* Glowing green HUD */
+    --mil-green-dark: 140 85% 25%;       /* Dark military green */
+    
+    --alert-critical: 0 100% 50%;        /* DEFCON red */
+    --alert-warning: 45 100% 50%;        /* Tactical amber */
+    --alert-success: 140 95% 45%;        /* Mission success green */
+    
+    --hud-primary: 140 95% 45%;          /* HUD primary color */
+    --hud-secondary: 60 100% 50%;        /* HUD secondary yellow */
+    --scan-line: 140 100% 50%;           /* Scanning line effect */
+    
+    --grid-line: 140 30% 25%;            /* Tactical grid lines */
+    --classified-red: 0 100% 40%;        /* Classified stamp red */
+    
+    /* Core System Colors */
+    --background: var(--tactical-black);
+    --foreground: 140 95% 95%;
+    
+    --card: var(--tactical-surface);
+    --card-foreground: 140 30% 95%;
+    
+    --popover: var(--tactical-elevated);
+    --popover-foreground: 140 30% 95%;
+    
+    --primary: var(--mil-green-bright);
+    --primary-foreground: 0 0% 0%;
+    
+    --secondary: var(--tactical-elevated);
+    --secondary-foreground: 140 30% 90%;
+    
+    --muted: var(--tactical-dark);
+    --muted-foreground: 140 10% 60%;
+    
+    --accent: var(--mil-green-glow);
+    --accent-foreground: 0 0% 0%;
+    
+    --destructive: var(--alert-critical);
+    --destructive-foreground: 0 0% 100%;
+    
+    --border: var(--grid-line);
+    --input: var(--tactical-surface);
+    --ring: var(--hud-primary);
+    
+    --radius: 0.125rem;
+    
+    /* Gradients */
+    --gradient-tactical: linear-gradient(135deg, hsl(var(--tactical-black)), hsl(var(--tactical-dark)));
+    --gradient-command: linear-gradient(180deg, hsl(var(--tactical-surface)) 0%, hsl(var(--tactical-black)) 100%);
+    --gradient-hud: linear-gradient(135deg, hsl(var(--hud-primary) / 0.2), hsl(var(--hud-primary) / 0.05));
+    --gradient-alert: linear-gradient(90deg, hsl(var(--alert-critical) / 0.3), transparent);
+    
+    /* Sidebar specific */
+    --sidebar-background: var(--tactical-dark);
+    --sidebar-foreground: 140 30% 90%;
+    --sidebar-primary: var(--mil-green-bright);
+    --sidebar-primary-foreground: 0 0% 0%;
+    --sidebar-accent: var(--tactical-surface);
+    --sidebar-accent-foreground: 140 30% 95%;
+    --sidebar-border: var(--grid-line);
+    --sidebar-ring: var(--hud-primary);
+    
+    /* Shadows */
+    --shadow-hud: 0 0 40px hsl(var(--hud-primary) / 0.4);
+    --shadow-tactical: 0 4px 24px hsl(0 0% 0% / 0.9);
+    --shadow-scan: 0 0 30px hsl(var(--scan-line) / 0.5);
+    --shadow-classified: 0 0 20px hsl(var(--classified-red) / 0.6);
+    
+    /* Animations */
+    --transition-tactical: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    --pulse-hud: pulse-hud 2s ease-in-out infinite;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    background: var(--gradient-tactical);
+    min-height: 100vh;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600;
+  }
+  
+  /* Defense Typography */
+  .font-tactical {
+    font-family: 'Chakra Petch', sans-serif;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  
+  .font-display {
+    font-family: 'Chakra Petch', sans-serif;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+  
+  .font-mono {
+    font-family: 'Share Tech Mono', monospace;
+  }
+}
+
+@layer components {
+  /* Tactical Command Effects */
+  .tactical-bg {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .tactical-bg::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+      linear-gradient(hsl(var(--grid-line) / 0.15) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(var(--grid-line) / 0.15) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+  
+  .tactical-bg > * {
+    position: relative;
+    z-index: 1;
+  }
+  
+  /* Scanline Effect */
+  .scanlines {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .scanlines::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+      to bottom,
+      transparent 50%,
+      hsl(var(--scan-line) / 0.03) 51%
+    );
+    background-size: 100% 4px;
+    pointer-events: none;
+    animation: scanline-move 8s linear infinite;
+  }
+  
+  /* HUD Grid Effect */
+  .hud-grid {
+    background-image: 
+      linear-gradient(hsl(var(--hud-primary) / 0.2) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(var(--hud-primary) / 0.2) 1px, transparent 1px);
+    background-size: 30px 30px;
+  }
+  
+  /* HUD Corner Brackets */
+  .hud-corners {
+    position: relative;
+  }
+  
+  .hud-corners::before,
+  .hud-corners::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border: 2px solid hsl(var(--hud-primary));
+  }
+  
+  .hud-corners::before {
+    top: -2px;
+    left: -2px;
+    border-right: none;
+    border-bottom: none;
+  }
+  
+  .hud-corners::after {
+    bottom: -2px;
+    right: -2px;
+    border-left: none;
+    border-top: none;
+  }
+  
+  /* Tactical Buttons */
+  .btn-tactical {
+    @apply bg-card border-2 border-primary/30 text-primary;
+    @apply hover:bg-primary/10 hover:border-primary;
+    @apply transition-all duration-200;
+    @apply font-tactical text-xs;
+    box-shadow: inset 0 0 20px hsl(var(--hud-primary) / 0.1);
+    clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+  }
+  
+  .btn-tactical:hover {
+    box-shadow: 
+      inset 0 0 30px hsl(var(--hud-primary) / 0.3),
+      0 0 20px hsl(var(--hud-primary) / 0.4);
+  }
+  
+  /* Status Indicators */
+  .status-active {
+    @apply text-primary bg-primary/10 border-primary/50;
+  }
+  
+  .status-warning {
+    @apply text-yellow-400 bg-yellow-400/10 border-yellow-400/50;
+  }
+  
+  .status-critical {
+    @apply text-red-500 bg-red-500/10 border-red-500/50;
+  }
+  
+  /* Confidence Indicators */
+  .confidence-high {
+    @apply text-primary bg-primary/10 border-primary/40;
+  }
+  
+  .confidence-medium {
+    @apply text-yellow-400 bg-yellow-400/10 border-yellow-400/40;
+  }
+  
+  .confidence-low {
+    @apply text-red-500 bg-red-500/10 border-red-500/40;
+  }
+  
+  /* Detection Overlays */
+  .detection-box {
+    border: 2px solid hsl(var(--hud-primary));
+    box-shadow: 0 0 20px hsl(var(--hud-primary) / 0.6);
+    animation: hud-pulse 2s ease-in-out infinite;
+  }
+  
+  /* Glow Effects */
+  .glow-hud {
+    box-shadow: var(--shadow-hud);
+  }
+  
+  .glow-scan {
+    box-shadow: var(--shadow-scan);
+  }
+  
+  /* Classified Stamp */
+  .classified {
+    position: relative;
+  }
+  
+  .classified::before {
+    content: 'CLASSIFIED';
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 4px 12px;
+    background: hsl(var(--classified-red) / 0.2);
+    border: 2px solid hsl(var(--classified-red));
+    color: hsl(var(--classified-red));
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    transform: rotate(-5deg);
+    box-shadow: var(--shadow-classified);
+  }
+  
+  /* Hexagonal Panels */
+  .hex-panel {
+    clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%);
+  }
+  
+  /* Angular Cuts */
+  .angular-cut {
+    clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+  }
+}
+
+@layer utilities {
+  /* Animation Keyframes */
+  @keyframes pulse-hud {
+    0%, 100% {
+      opacity: 0.7;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.05);
+    }
+  }
+  
+  @keyframes hud-pulse {
+    0%, 100% {
+      box-shadow: 0 0 20px hsl(var(--hud-primary) / 0.6);
+      border-color: hsl(var(--hud-primary));
+    }
+    50% {
+      box-shadow: 0 0 40px hsl(var(--hud-primary) / 1);
+      border-color: hsl(var(--hud-primary) / 0.6);
+    }
+  }
+  
+  @keyframes radar-sweep {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+  
+  @keyframes scanline-move {
+    0% {
+      transform: translateY(0);
+    }
+    100% {
+      transform: translateY(100%);
+    }
+  }
+  
+  @keyframes glitch {
+    0% {
+      transform: translate(0);
+    }
+    20% {
+      transform: translate(-2px, 2px);
+    }
+    40% {
+      transform: translate(-2px, -2px);
+    }
+    60% {
+      transform: translate(2px, 2px);
+    }
+    80% {
+      transform: translate(2px, -2px);
+    }
+    100% {
+      transform: translate(0);
+    }
+  }
+  
+  @keyframes blink {
+    0%, 49% {
+      opacity: 1;
+    }
+    50%, 100% {
+      opacity: 0.3;
+    }
+  }
+
+  @keyframes slideInLeft {
+    from {
+      transform: translateX(-20px);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideInRight {
+    from {
+      transform: translateX(20px);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+}
