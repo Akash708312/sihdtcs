@@ -11,6 +11,8 @@ import Metrics from "./pages/Metrics";
 import Logs from "./pages/Logs";
 import About from "./pages/About";
 import Login from "./pages/Login";
+import Shutdown from "./pages/Shutdown";
+import Startup from "./pages/Startup";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -21,19 +23,28 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Layout>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/upload" element={<Upload />} />
-            <Route path="/detection" element={<Detection />} />
-            <Route path="/metrics" element={<Metrics />} />
-            <Route path="/logs" element={<Logs />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/login" element={<Login />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </Layout>
+        <Routes>
+          {/* Standalone routes without Layout */}
+          <Route path="/shutdown" element={<Shutdown />} />
+          <Route path="/startup" element={<Startup />} />
+          <Route path="/login" element={<Login />} />
+          
+          {/* Routes with Layout */}
+          <Route path="/*" element={
+            <Layout>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/upload" element={<Upload />} />
+                <Route path="/detection" element={<Detection />} />
+                <Route path="/metrics" element={<Metrics />} />
+                <Route path="/logs" element={<Logs />} />
+                <Route path="/about" element={<About />} />
+                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </Layout>
+          } />
+        </Routes>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

@@ -2,7 +2,9 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "./AppSidebar";
 import { Bell, Power, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -10,6 +12,16 @@ interface LayoutProps {
 
 export function Layout({ children }: LayoutProps) {
   const navigate = useNavigate();
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  // Update time every second
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
 
   return (
     <SidebarProvider>
@@ -33,21 +45,46 @@ export function Layout({ children }: LayoutProps) {
               
               <div className="flex items-center gap-2">
                 <div className="font-mono text-xs text-primary mr-4">
-                  {new Date().toLocaleTimeString('en-US', { hour12: false })}
+                  {currentTime.toLocaleTimeString('en-US', { hour12: false })}
                 </div>
-                <Button size="icon" className="btn-tactical h-8 w-8">
-                  <Bell className="h-3 w-3" />
-                </Button>
-                <Button 
-                  size="icon" 
-                  className="btn-tactical h-8 w-8"
-                  onClick={() => navigate('/login')}
-                >
-                  <User className="h-3 w-3" />
-                </Button>
-                <Button size="icon" className="btn-tactical h-8 w-8 border-red-500/30 text-red-500 hover:border-red-500">
-                  <Power className="h-3 w-3" />
-                </Button>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button size="icon" className="btn-tactical h-8 w-8">
+                      <Bell className="h-3 w-3" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="font-mono text-xs">Notifications</p>
+                  </TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button 
+                      size="icon" 
+                      className="btn-tactical h-8 w-8"
+                      onClick={() => navigate('/login')}
+                    >
+                      <User className="h-3 w-3" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="font-mono text-xs">Login</p>
+                  </TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button 
+                      size="icon" 
+                      className="btn-tactical h-8 w-8 border-red-500/30 text-red-500 hover:border-red-500"
+                      onClick={() => navigate('/shutdown')}
+                    >
+                      <Power className="h-3 w-3" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="font-mono text-xs">Power Off</p>
+                  </TooltipContent>
+                </Tooltip>
               </div>
             </div>
             
