@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Upload, Camera, Activity, Shield, Target, Clock, Zap, Cpu } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -25,43 +26,192 @@ const systemMetrics = [
 ];
 
 const Index = () => {
+  const navigate = useNavigate();
   const [systemStatus] = useState("OPERATIONAL");
+
+  const [videoLoaded, setVideoLoaded] = useState(false);
+  const [videoError, setVideoError] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  const handleDeployMission = () => {
+    navigate('/upload');
+  };
+
+  const handleLiveSurveillance = () => {
+    navigate('/detection');
+  };
+
+
+
+  useEffect(() => {
+    if (videoRef.current) {
+      const video = videoRef.current;
+      
+      const handleLoadedData = () => {
+        setVideoLoaded(true);
+        // Try to play video immediately
+        video.play().catch((error) => {
+          console.log("Autoplay failed:", error);
+          // If autoplay fails, we'll show controls for user to click
+        });
+      };
+
+      const handleError = () => {
+        setVideoError(true);
+        console.error("Video failed to load");
+      };
+
+      video.addEventListener('loadeddata', handleLoadedData);
+      video.addEventListener('error', handleError);
+      
+      // Load the video immediately
+      video.load();
+
+      return () => {
+        video.removeEventListener('loadeddata', handleLoadedData);
+        video.removeEventListener('error', handleError);
+      };
+    }
+  }, []);
   
   return (
     <div className="p-6 space-y-6 tactical-bg">
       <div className="max-w-7xl mx-auto">
-        {/* Hero Section */}
-        <div className="relative mb-8 angular-cut overflow-hidden border-2 border-primary/30 hud-corners">
-          <img 
-            src={heroImage} 
-            alt="Defense Command Center" 
-            className="w-full h-72 object-cover opacity-40"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-tactical-black via-tactical-black/80 to-transparent"></div>
-          <div className="absolute inset-0 hud-grid opacity-20"></div>
-          <div className="absolute inset-0 flex items-center">
-            <div className="p-12">
-              <div className="font-mono text-xs text-primary mb-2 tracking-widest">
-                [ CLASSIFIED - DEFENSE GRADE AI SYSTEM ]
+        {/* Video Section with Text Overlay */}
+        <div 
+          className="relative mb-8 angular-cut overflow-hidden border-2 border-primary/30 hud-corners h-96"
+          onClick={() => {
+            if (videoRef.current && videoRef.current.paused) {
+              videoRef.current.play().catch(console.error);
+            }
+          }}
+        >
+          {/* Video Header */}
+          <div className="absolute top-0 left-0 right-0 z-20 bg-tactical-dark/90 border-b border-primary/30 p-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-red-500 rounded-full animate-blink"></div>
+                <span className="font-tactical text-xs text-primary">MISSION BRIEFING - LIVE FEED</span>
               </div>
-              <h1 className="font-display text-5xl text-primary mb-3 animate-fadeIn">
-                DEFENSE TACTICAL COMMAND
-              </h1>
-              <p className="text-lg text-foreground mb-6 font-tactical max-w-2xl">
-                AI-POWERED THREAT DETECTION & ANALYSIS SYSTEM
-              </p>
-              <div className="flex gap-4">
-                <Button size="lg" className="glow-hud">
-                  <Upload className="h-4 w-4 mr-2" />
-                  DEPLOY MISSION
-                </Button>
-                <Button variant="outline" size="lg">
-                  <Camera className="h-4 w-4 mr-2" />
-                  LIVE SURVEILLANCE
-                </Button>
+              <div className="font-mono text-xs text-muted-foreground">
+                CLASSIFIED INTEL - DTCS OVERVIEW
               </div>
             </div>
           </div>
+
+          {/* Video Container */}
+          <div className="relative w-full h-full">
+            {videoError ? (
+              <div className="w-full h-full flex items-center justify-center bg-tactical-surface/50">
+                <div className="text-center">
+                  <div className="font-tactical text-red-500 mb-2">VIDEO FEED ERROR</div>
+                  <div className="font-mono text-xs text-muted-foreground">Unable to load mission briefing</div>
+                </div>
+              </div>
+            ) : (
+              <video 
+                ref={videoRef}
+                className="w-full h-full object-cover"
+                controls
+                loop
+                muted
+                playsInline
+                preload="auto"
+                autoPlay
+              >
+                <source src="/My%20SIH%20Video.mp4" type="video/mp4" />
+                <source src="/My SIH Video.mp4" type="video/mp4" />
+                <source src="./My SIH Video.mp4" type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+            )}
+            
+            {!videoLoaded && !videoError && (
+              <div className="absolute inset-0 flex items-center justify-center bg-tactical-surface/50">
+                <div className="text-center">
+                  <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+                  <div className="font-mono text-xs text-primary">LOADING TACTICAL FEED...</div>
+                </div>
+              </div>
+            )}
+
+            {videoLoaded && videoRef.current?.paused && (
+              <div className="absolute inset-0 flex items-center justify-center bg-tactical-black/50 backdrop-blur-sm">
+                <Button 
+                  className="glow-hud text-lg px-8 py-4"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (videoRef.current) {
+                      videoRef.current.play().catch(console.error);
+                    }
+                  }}
+                >
+                  <Camera className="h-6 w-6 mr-3" />
+                  START MISSION BRIEFING
+                </Button>
+              </div>
+            )}
+          </div>
+
+          {/* Text Overlay - Always Visible */}
+          <div className="absolute inset-0 flex items-center justify-center z-25 pointer-events-none">
+            <div className="text-center">
+              <div className="font-mono text-sm text-primary mb-4 tracking-widest drop-shadow-lg">
+                [ CLASSIFIED - DEFENSE GRADE AI SYSTEM ]
+              </div>
+              <h1 className="font-display text-6xl text-primary mb-6 drop-shadow-lg">
+                DEFENSE TACTICAL COMMAND
+              </h1>
+              <p className="text-xl text-foreground font-tactical max-w-3xl mx-auto drop-shadow-lg">
+                AI-POWERED THREAT DETECTION & ANALYSIS SYSTEM
+              </p>
+            </div>
+          </div>
+          
+          {/* Video Overlay Effects */}
+          <div className="absolute inset-0 pointer-events-none z-10">
+            <div className="absolute inset-0 hud-grid opacity-5"></div>
+            {/* Scanline effect */}
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/3 to-transparent h-1" 
+                 style={{ 
+                   animation: 'scanline-move 8s linear infinite',
+                   height: '2px'
+                 }} />
+          </div>
+
+          {/* Action Buttons Overlay */}
+          <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-30">
+            <div className="flex gap-4">
+              <Button 
+                variant="outline"
+                className="text-sm px-6 py-3 bg-tactical-surface/80 backdrop-blur-sm border-2 border-primary/50 hover:bg-primary/20 text-primary"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDeployMission();
+                }}
+              >
+                <Upload className="h-4 w-4 mr-2" />
+                DEPLOY MISSION
+              </Button>
+              <Button 
+                variant="outline" 
+                className="text-sm px-6 py-3 bg-tactical-surface/80 backdrop-blur-sm border-2 border-primary/50 hover:bg-primary/20 text-primary"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleLiveSurveillance();
+                }}
+              >
+                <Camera className="h-4 w-4 mr-2" />
+                LIVE SURVEILLANCE
+              </Button>
+            </div>
+          </div>
+
+          {/* Corner Brackets */}
+          <div className="absolute top-4 left-4 w-8 h-8 border-l-2 border-t-2 border-primary/60 pointer-events-none z-20"></div>
+          <div className="absolute top-4 right-4 w-8 h-8 border-r-2 border-t-2 border-primary/60 pointer-events-none z-20"></div>
+          <div className="absolute bottom-4 left-4 w-8 h-8 border-l-2 border-b-2 border-primary/60 pointer-events-none z-20"></div>
+          <div className="absolute bottom-4 right-4 w-8 h-8 border-r-2 border-b-2 border-primary/60 pointer-events-none z-20"></div>
         </div>
 
         {/* System Status Banner */}
